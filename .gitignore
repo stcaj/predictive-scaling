@@ -1,19 +1,15 @@
 venv
 
-# data - not usefull
-fastStorageData
-microservice-online-boutique
-data/scripts/
-# data/metrics_yearly/
-
+# data - do not save in git
 data/data_preprocessing/
 data/test-week-not-finished/
 data/__pycache__
-data/fail
+data/synthetic_year
 logs-backup/
 logs/
-# not mine - but useful
-VMW_Predictor
+
+data/MLP/bin
+data/Hybrid/bin
 
 # pycache dir
 LSTM&Hybrid/__pycache__
@@ -30,13 +26,6 @@ MLP/logs
 MLP/saved_oneStepModel
 MLP/saved_multiStepModel
 pods_metric_data
-
-data/MLP/locust
-data/MLP/prometheus
-data/MLP/*.log
-data/Hybrid/locust
-data/Hybrid/prometheus
-data/Hybrid/*.log
 
 # older files -> might be useful in the future
 older

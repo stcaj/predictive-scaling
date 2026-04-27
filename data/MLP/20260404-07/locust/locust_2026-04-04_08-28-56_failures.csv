@@ -1,0 +1,19 @@
+Method,Name,Error,Occurrences
+GET,/product/1YMWWN1N4O,LocustBadStatusCode(code=500),72
+POST,/setCurrency,LocustBadStatusCode(code=500),205
+GET,/product/0PUK6V6EV0,LocustBadStatusCode(code=500),68
+GET,/product/1YMWWN1N4O,"ConnectionRefusedError(111, 'Connection refused')",1
+GET,/product/OLJCESPC7Z,"ConnectionRefusedError(111, 'Connection refused')",1
+POST,/cart,LocustBadStatusCode(code=500),172
+GET,/cart,LocustBadStatusCode(code=500),202
+GET,/product/L9ECAV7KIM,LocustBadStatusCode(code=500),67
+POST,/cart/checkout,"ConnectionRefusedError(111, 'Connection refused')",1
+GET,/,LocustBadStatusCode(code=500),149
+GET,/product/66VCHSJNUP,LocustBadStatusCode(code=500),62
+GET,/product/2ZYFJ3GM2N,LocustBadStatusCode(code=500),83
+GET,/cart,"ConnectionRefusedError(111, 'Connection refused')",1
+GET,/product/OLJCESPC7Z,LocustBadStatusCode(code=500),78
+GET,/product/6E92ZMYYFZ,LocustBadStatusCode(code=500),84
+POST,/cart/checkout,LocustBadStatusCode(code=500),1930
+GET,/product/LS4PSXUNUM,LocustBadStatusCode(code=500),71
+GET,/product/9SIQT8TOJO,LocustBadStatusCode(code=500),66
