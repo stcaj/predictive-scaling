@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+imbalanced-learn
+matplotlib
+joblib
+PyYAML
+requests
+kubernetes

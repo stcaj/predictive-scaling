@@ -1,0 +1,537 @@
+# ---------------- RBAC ----------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: autoscaler-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-scaler
+  namespace: default
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deployment-scaler-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: autoscaler-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: deployment-scaler
+  apiGroup: rbac.authorization.k8s.io
+
+# ---------------- LSTM train ----------------
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lstm-train-daily
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: lstm-train-daily
+#   template:
+#     metadata:
+#       labels:
+#         app: lstm-train-daily
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: lstm-model
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_lstm.py"]
+#           env:
+#             - name: EPOCHS
+#               value: "10"
+#             - name: SLEEP_TIME
+#               value: "1440"
+#             - name: TARGET_NAME
+#               value: "single_output"
+#             - name: SAVE_DIR
+#               value: "/app/logs/lstm"
+#             - name: LOG_FILE
+#               value: "/app/logs/lstm_train_daily.log"
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#           resources:
+#             requests:
+#               cpu: "600m"
+#               memory: "512Mi"
+#             limits:
+#               cpu: "1"
+#               memory: "1Gi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lstm-train-daily-multi
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: lstm-train-daily-multi
+#   template:
+#     metadata:
+#       labels:
+#         app: lstm-train-daily-multi
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: lstm-model
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_lstm_multi.py"]
+#           env:
+#             - name: EPOCHS
+#               value: "10"
+#             - name: SLEEP_TIME
+#               value: "1440"
+#             - name: TARGET_NAME
+#               value: "multi_input"
+#             - name: SAVE_DIR
+#               value: "/app/logs/lstm-multi-input"
+#             - name: LOG_FILE
+#               value: "/app/logs/lstm_train_daily_multi_input.log"
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#           resources:
+#             requests:
+#               cpu: "800m"
+#               memory: "1Gi"
+#             limits:
+#               cpu: "2"
+#               memory: "2Gi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate
+# # ---------------- Hybrid train ----------------
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: hybrid-train-daily
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: hybrid-train-daily
+#   template:
+#     metadata:
+#       labels:
+#         app: hybrid-train-daily
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: hybrid-model
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_hybrid.py"]
+#           env:
+#             - name: EPOCHS
+#               value: "10"
+#             - name: SLEEP_TIME
+#               value: "1440"
+#             - name: TARGET_NAME
+#               value: "single_output"
+#             - name: SAVE_DIR
+#               value: "/app/logs/hybrid"
+#             - name: LOG_FILE
+#               value: "/app/logs/hybrid_train_daily.log"
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#           resources:
+#             requests:
+#               cpu: "600m"
+#               memory: "512Mi"
+#             limits:
+#               cpu: "1"
+#               memory: "1Gi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: hybrid-train-daily-multi
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: hybrid-train-daily-multi
+#   template:
+#     metadata:
+#       labels:
+#         app: hybrid-train-daily-multi
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: hybrid-model
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_hybrid_multi.py"]
+#           env:
+#             - name: EPOCHS
+#               value: "10"
+#             - name: SLEEP_TIME
+#               value: "1440"
+#             - name: TARGET_NAME
+#               value: "multi_input"
+#             - name: SAVE_DIR
+#               value: "/app/logs/hybrid-multi-input"
+#             - name: LOG_FILE
+#               value: "/app/logs/hybrid_train_daily_multi_input.log"
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#           resources:
+#             requests:
+#               cpu: "800m"
+#               memory: "1Gi"
+#             limits:
+#               cpu: "2"
+#               memory: "2Gi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate
+
+
+# ---------------- Prediction ----------------
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lstm-predict
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: lstm-predict
+#   template:
+#     metadata:
+#       labels:
+#         app: lstm-predict
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: fortune-teller
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_prediction.py"]
+#           env:
+#             - name: SAVE_DIR
+#               value: "/app/logs/lstm"          
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#             - name: MODEL
+#               value: "lstm"
+#             - name: LOG_FILE
+#               value: "/app/logs/lstm_predictions.log"
+#           resources:
+#             requests:
+#               cpu: "300m"
+#               memory: "256Mi"
+#             limits:
+#               cpu: "800m"
+#               memory: "512Mi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lstm-predict-multi
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: lstm-predict
+#   template:
+#     metadata:
+#       labels:
+#         app: lstm-predict
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: fortune-teller
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_prediction_multi.py"]
+#           env:
+#             - name: SAVE_DIR
+#               value: "/app/logs/lstm-multi-input"          
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#             - name: MODEL
+#               value: "lstm"
+#             - name: LOG_FILE
+#               value: "/app/logs/lstm_predictions.log"
+#           resources:
+#             requests:
+#               cpu: "300m"
+#               memory: "256Mi"
+#             limits:
+#               cpu: "800m"
+#               memory: "512Mi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate            
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hybrid-predict
+  labels:
+    app-group: sequence
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: hybrid-predict
+  template:
+    metadata:
+      labels:
+        app: hybrid-predict
+    spec:
+      serviceAccountName: autoscaler-sa
+      containers:
+        - name: fortune-teller
+          image: sequence-autoscaler:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "main_prediction.py"]
+          env:
+            - name: SAVE_DIR
+              value: "/app/logs/hybrid"          
+            - name: TZ
+              value: "Europe/Bratislava"
+            - name: MODEL
+              value: "hybrid"
+            - name: LOG_FILE
+              value: "/app/logs/hybrid_predictions.log"
+            - name: SLEEP_TIME
+              value: "1"              
+          resources:
+            requests:
+              cpu: "400m"
+              memory: "256Mi"
+            limits:
+              cpu: "800m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: sequence-config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+            - name: scaling-config
+              mountPath: /app/config-scaling.yaml
+              subPath: config-scaling.yaml              
+            - name: usb-logs
+              mountPath: /app/logs
+      volumes:
+        - name: sequence-config
+          configMap:
+            name: sequence-config
+        - name: scaling-config
+          configMap:
+            name: scaling-config      
+        - name: usb-logs
+          hostPath:
+            path: /mnt/data/logs
+            type: DirectoryOrCreate
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: hybrid-predict-multi
+#   labels:
+#     app-group: sequence
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: hybrid-predict
+#   template:
+#     metadata:
+#       labels:
+#         app: hybrid-predict
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: fortune-teller
+#           image: sequence-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_prediction_multi.py"]
+#           env:
+#             - name: SAVE_DIR
+#               value: "/app/logs/hybrid-multi-input"          
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#             - name: MODEL
+#               value: "hybrid"
+#             - name: LOG_FILE
+#               value: "/app/logs/hybrid_predictions.log"
+#           resources:
+#             requests:
+#               cpu: "400m"
+#               memory: "256Mi"
+#             limits:
+#               cpu: "800m"
+#               memory: "512Mi"
+#           volumeMounts:
+#             - name: sequence-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: sequence-config
+#           configMap:
+#             name: sequence-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate          
+
+
+
+# prometheus collector 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sequence-prometheus-collector
+  labels:
+    app-group: sequence
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: sequence-prometheus-collector
+  template:
+    metadata:
+      labels:
+        app: sequence-prometheus-collector
+    spec:
+      serviceAccountName: autoscaler-sa
+      containers:
+        - name: sequence-prometheus-collector
+          image: sequence-autoscaler:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "prometheus_collector.py"]
+          env:       
+            - name: TZ
+              value: "Europe/Bratislava"
+            - name: MODEL
+              value: "hybrid"
+          resources:
+            requests:
+              cpu: "400m"
+              memory: "256Mi"
+            limits:
+              cpu: "800m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: sequence-config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+            - name: usb-logs
+              mountPath: /app/logs
+      volumes:
+        - name: sequence-config
+          configMap:
+            name: sequence-config
+        - name: usb-logs
+          hostPath:
+            path: /mnt/data/logs
+            type: DirectoryOrCreate            

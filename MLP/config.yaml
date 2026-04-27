@@ -1,0 +1,128 @@
+paths:
+  mlp_oneStep:
+    model_path: "/app/logs/saved_oneStepModel/model"
+    data_path: "/app/logs/saved_oneStepModel/data"
+  mlp_multiStep:
+    model_path: "/app/logs/multi-mlp/model"
+    data_path: "/app/logs/multi-mlp/data"
+  logs:
+    log_path: "logs/"
+    train_log_path: "/app/logs/mlp_model_training.log"
+    prediction_log_path: "/app/logs/mlp_model_predictions.log"
+
+metadata:
+  model_param:
+    batch_size: 128
+    epochs: 10
+    hidden_layer_sizes: [100,50]
+    max_iter: 1
+    random_state: 42
+    sample_history: 10
+
+    mlp_oneStep_future_labels: 1
+    mlp_multiStep_future_labels: 5
+    skipped_steps: 1
+
+    training_sleep_minutes: 30
+    prediction_sleep_minutes: 1
+
+  fastStorage_param:
+    features: 7
+    class_values: [0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 100]
+
+  prometheus_param:
+    url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+    features: 12
+  
+  # need to be in the same order
+  app_deployments: [
+    "adservice",
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "frontend",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice",
+  ]
+  # does not need to be in the same order, but should be a subset of app_deployments
+  scale_deployments: [
+    "frontend",
+    "adservice",  
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice",
+  ]
+    
+  data_param:
+    features_multiplier: 10
+    # features_multiplier: 5
+    # features_multiplier: 20
+    
+    skipped_steps: 10
+    hours_loaded: 20
+    step_seconds: 60
+
+    # class_values: [0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 100]
+    # class_values: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]        
+    # class_values: [0, 20, 40, 60, 80, 100]
+    # class_values: [20, 40, 60, 80, 100]
+    # class_values: [40, 60, 70, 80, 90, 100]
+    class_values: [40, 60, 80, 100]
+    DOWN_CLASS: 0
+    UP_CLASS: 2
+    TARGET_CLASS: 2
+
+    model_name: "mlp_multiStep"
+    input_type: "cpu_features"
+    strategy: "median"
+
+    numeric_features: [
+      "hour", 
+      "minute", 
+      "day_of_week", 
+      "month",
+      "cpu", 
+      "cpu_percent",
+      "memory_bytes", 
+      "memory_percent",
+      "desired_replicas", 
+      "available_replicas",
+      "deployment_id"
+    ]
+    cpu_features: [
+      "cpu_percent",
+    ]
+    cpu_time_features: [
+      "hour_sin", 
+      "hour_cos",
+      "day_of_week_sin", 
+      "day_of_week_cos", 
+      "cpu_percent",
+    ]
+    cpu_min_time_features: [
+      "hour_sin", 
+      "hour_cos",
+      "minute_sin", 
+      "minute_cos", 
+      "day_of_week_sin", 
+      "day_of_week_cos", 
+      "cpu_percent",
+    ]
+    multi_features: [
+      "hour_sin", 
+      "hour_cos",
+      "minute_sin", 
+      "minute_cos", 
+      "day_of_week_sin", 
+      "day_of_week_cos", 
+      "cpu_percent",
+      "memory_percent",
+    ]    

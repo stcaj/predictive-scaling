@@ -1,0 +1,13 @@
+resources:
+  - deployment.yaml
+
+configMapGenerator:
+  - name: mlp-config
+    files:
+      - config.yaml
+  - name: scaling-config
+    files:
+      - config-scaling.yaml
+      
+generatorOptions:
+  disableNameSuffixHash: true

@@ -1,0 +1,11 @@
+joblib
+keras
+matplotlib
+numpy
+pandas
+PyYAML
+requests
+scikit-learn
+seaborn
+tensorflow
+kubernetes

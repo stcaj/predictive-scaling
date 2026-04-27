@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: autoscaler-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-scaler
+  namespace: default
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "list", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deployment-scaler-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: autoscaler-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: deployment-scaler
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlp-predict
+  labels:
+    app-group: mlp
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: mlp-predict
+  template:
+    metadata:
+      labels:
+        app: mlp-predict
+    spec:
+      serviceAccountName: autoscaler-sa
+      containers:
+        - name: fortune-teller
+          image: mlp-autoscaler:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "main_fortune_teller.py"]
+          env:
+            - name: TZ
+              value: "Europe/Bratislava"    
+            - name: SLEEP_TIME
+              value: "1"   
+            - name: WARMUP_MINUTES
+              value: "2"                    
+            - name: LOG_FILE
+              value: "/app/logs/mlp_model_predictions.log"             
+          volumeMounts:
+            - name: mlp-config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+            - name: scaling-config
+              mountPath: /app/config-scaling.yaml
+              subPath: config-scaling.yaml
+            - name: usb-logs
+              mountPath: /app/logs
+          resources:
+            requests:
+              cpu: "800m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+      volumes:
+        - name: mlp-config
+          configMap:
+            name: mlp-config
+        - name: scaling-config
+          configMap:
+            name: scaling-config
+        - name: usb-logs
+          hostPath:
+            path: /mnt/data/logs
+            type: DirectoryOrCreate
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mlp-train-daily
+#   labels:
+#     app-group: mlp
+# spec:
+#   replicas: 0
+#   selector:
+#     matchLabels:
+#       app: mlp-train-daily
+#   template:
+#     metadata:
+#       labels:
+#         app: mlp-train-daily
+#     spec:
+#       serviceAccountName: autoscaler-sa
+#       containers:
+#         - name: multi-step-mlp
+#           image: mlp-autoscaler:latest
+#           imagePullPolicy: IfNotPresent
+#           command: ["python", "main_multiStep_MLP.py"]
+#           env:
+#             - name: SLEEP_TIME
+#               value: "1440"
+#             - name: LOG_FILE
+#               value: "/app/logs/mlp-train_daily.log"
+#             - name: TZ
+#               value: "Europe/Bratislava"
+#           volumeMounts:
+#             - name: mlp-config
+#               mountPath: /app/config.yaml
+#               subPath: config.yaml
+#             - name: usb-logs
+#               mountPath: /app/logs
+#       volumes:
+#         - name: mlp-config
+#           configMap:
+#             name: mlp-config
+#         - name: usb-logs
+#           hostPath:
+#             path: /mnt/data/logs
+#             type: DirectoryOrCreate

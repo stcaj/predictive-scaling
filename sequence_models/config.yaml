@@ -1,0 +1,182 @@
+fastStorage_config:
+  fastStorage_patern: "data/fastStorage/*.csv"
+  features: [
+    "timestamp",
+    "hour",
+    "minute",
+    "day_of_week",
+    "month",
+    "cpu_avg",
+    "mem_avg"
+  ]
+  multi_features: [
+    "hour",
+    "day_of_week",
+    "cpu_avg",
+    "mem_avg"    
+  ]
+  single_feature: ["cpu_avg"]
+  target_col: "cpu_avg"
+
+prometheus_config:
+  url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+  feature_count: 12
+  features: [
+    "timestamp",
+    "hour", 
+    "minute", 
+    "day_of_week", 
+    "month",
+    "cpu", 
+    "cpu_percent",
+    "memory_bytes", 
+    "memory_percent",
+    "desired_replicas", 
+    "available_replicas",
+    "deployment_id"
+  ]
+  single_feature: ["cpu_percent"]
+  multi_features: [
+      "hour",
+      "day_of_week",
+      "cpu_percent",
+  ]
+  multi_features_mem: [
+      "hour",
+      "day_of_week",
+      "cpu_percent",
+      "memory_percent",
+  ]
+  target_col: "cpu_percent"
+
+app_config:
+  deployments: [
+    "frontend",
+    "adservice",  
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice",
+    # "redis-cart",
+    # "loadgenerator",
+  ]
+  collection_deployments: [
+    "frontend",
+    "adservice",  
+    "cartservice",
+    "checkoutservice",
+    "currencyservice",
+    "emailservice",
+    "paymentservice",
+    "productcatalogservice",
+    "recommendationservice",
+    "shippingservice",
+  ]
+
+lstm_config:
+  paths:
+    save_dir: "/app/logs/lstm"
+    fastStorage_save_dir: "logs/lstm"
+    prediction_logs: "/app/logs/lstm_predictions.log"
+    training_logs: "/app/logs/lstm_training.log"
+  
+  metadata:
+    data_param:
+      step_seconds: 60 
+      hours_loaded: 24
+      sleep_time: 60
+      prediction_sleep: 10
+  
+    model_param:
+      epochs: 10
+      seq_length: 32
+      # seq_length: 64
+      # seq_length: 16
+      batch_size: 128
+      sample_size_averege: 30
+      # units1: 64
+      # units2: 32
+      units1: 32
+      units2: 16
+    
+    weights:
+      MAE: 0.3
+      RMSE: 0.5
+      R2: 0.2
+
+    EarlyStopping_param:
+      monitor: 'val_loss'
+      # patience: 8
+      patience: 4
+      restore_best_weights: True
+      verbose: 1
+      mode: 'min'
+
+    ReduceLROnPlateau_param:
+      monitor: 'val_loss'
+      factor: 0.2
+      # patience: 4
+      patience: 2
+      verbose: 1
+      min_lr: 1e-7
+
+hybrid_config:
+  paths:
+    save_dir: "/app/logs/hybrid"
+    fastStorage_save_dir: "logs/hybrid"
+    prediction_logs: "/app/logs/hybrid_predictions.log"
+    training_logs: "/app/logs/hybrid_training.log"
+  
+  metadata:
+    data_param:
+      step_seconds: 60 
+      hours_loaded: 24
+      sleep_time: 60
+      prediction_sleep: 10
+
+    model_param:
+      epochs: 10
+      seq_length: 32
+      # seq_length: 64
+      # seq_length: 16
+      batch_size: 128
+      sample_size_averege: 30
+      # units: 300
+      units: 128
+    
+    weights:
+      MAE: 0.3
+      RMSE: 0.5
+      R2: 0.2
+    
+    EarlyStopping_param:
+      monitor: 'val_loss'
+      # patience: 8
+      patience: 4
+      restore_best_weights: True
+      verbose: 1
+      mode: 'min'
+
+    ReduceLROnPlateau_param:
+      monitor: 'val_loss'
+      factor: 0.2
+      # patience: 4
+      patience: 2
+      verbose: 1
+      min_lr: 1e-7
+
+prediction_config:
+  future_steps: 5
+  strategy: 'median'
+  pod_cpu_target: 70
+  upscale_threshold: 70
+  downscale_threshold: 60
+  upscale_cooldown_seconds: 0
+  downscale_cooldown_seconds: 300
+  downscale_after_upscale_delay_seconds: 300
+  upscale_replica_limit: 4
+  downscale_replica_limit: 1

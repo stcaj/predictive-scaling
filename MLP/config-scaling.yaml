@@ -1,0 +1,43 @@
+services:
+  adservice:
+    min_pods: 1
+    max_pods: 2
+
+  cartservice:
+    min_pods: 2
+    max_pods: 3
+
+  checkoutservice:
+    min_pods: 1
+    max_pods: 2
+
+  currencyservice:
+    min_pods: 2
+    max_pods: 4
+
+  emailservice:
+    min_pods: 1
+    max_pods: 2
+
+  frontend:
+    min_pods: 2
+    max_pods: 6
+
+  paymentservice:
+    min_pods: 2
+    max_pods: 3
+
+  productcatalogservice:
+    min_pods: 2
+    max_pods: 3
+
+  recommendationservice:
+    min_pods: 2
+    max_pods: 5
+
+  shippingservice:
+    min_pods: 1
+    max_pods: 2
+
+metadata:
+  class_values: [0, 20, 40, 60, 80, 100]
