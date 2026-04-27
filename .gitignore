@@ -1,0 +1,45 @@
+venv
+
+# data - not usefull
+fastStorageData
+microservice-online-boutique
+data/scripts/
+# data/metrics_yearly/
+
+data/data_preprocessing/
+data/test-week-not-finished/
+data/__pycache__
+data/fail
+logs-backup/
+logs/
+# not mine - but useful
+VMW_Predictor
+
+# pycache dir
+LSTM&Hybrid/__pycache__
+LSTM&Hybrid/offline_tests_out
+LSTM&Hybrid/my_modules/__pycache__
+MLP/__pycache__
+MLP/offline_tests_out
+MLP/my_modules/__pycache__
+data/mlp-save
+
+# saved data
+LSTM&Hybrid/logs
+MLP/logs
+MLP/saved_oneStepModel
+MLP/saved_multiStepModel
+pods_metric_data
+
+data/MLP/locust
+data/MLP/prometheus
+data/MLP/*.log
+data/Hybrid/locust
+data/Hybrid/prometheus
+data/Hybrid/*.log
+
+# older files -> might be useful in the future
+older
+# will be added in the future
+data/test_app_in_thesis/*
+!data/test_app_in_thesis/README.md
